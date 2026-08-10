@@ -1,0 +1,8 @@
+// Safe defaults committed to the repository.
+// Copy Local.xcconfig.example to Local.xcconfig for personal signing overrides.
+
+DEVELOPMENT_TEAM =
+PRODUCT_BUNDLE_IDENTIFIER = org.qingheng.app
+TEST_PRODUCT_BUNDLE_IDENTIFIER = org.qingheng.app.tests
+
+#include? "Local.xcconfig"

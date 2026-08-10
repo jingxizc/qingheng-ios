@@ -1,0 +1,572 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 56;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		100000000000000000000001 /* DietApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 200000000000000000000001 /* DietApp.swift */; };
+		100000000000000000000002 /* WeightRecord.swift in Sources */ = {isa = PBXBuildFile; fileRef = 200000000000000000000002 /* WeightRecord.swift */; };
+		100000000000000000000003 /* MealRecord.swift in Sources */ = {isa = PBXBuildFile; fileRef = 200000000000000000000003 /* MealRecord.swift */; };
+		100000000000000000000004 /* ScaleDataParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 200000000000000000000004 /* ScaleDataParser.swift */; };
+		100000000000000000000005 /* BluetoothScaleManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 200000000000000000000005 /* BluetoothScaleManager.swift */; };
+		100000000000000000000006 /* AppTheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 200000000000000000000006 /* AppTheme.swift */; };
+		100000000000000000000007 /* WeightChart.swift in Sources */ = {isa = PBXBuildFile; fileRef = 200000000000000000000007 /* WeightChart.swift */; };
+		100000000000000000000008 /* MealPhoto.swift in Sources */ = {isa = PBXBuildFile; fileRef = 200000000000000000000008 /* MealPhoto.swift */; };
+		100000000000000000000009 /* RootTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 200000000000000000000009 /* RootTabView.swift */; };
+		10000000000000000000000A /* DashboardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20000000000000000000000A /* DashboardView.swift */; };
+		10000000000000000000000B /* MealsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20000000000000000000000B /* MealsView.swift */; };
+		10000000000000000000000C /* ProgressView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20000000000000000000000C /* ProgressView.swift */; };
+		10000000000000000000000D /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20000000000000000000000D /* SettingsView.swift */; };
+		10000000000000000000000E /* AddWeightSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20000000000000000000000E /* AddWeightSheet.swift */; };
+		10000000000000000000000F /* AddMealView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20000000000000000000000F /* AddMealView.swift */; };
+		100000000000000000000010 /* ScaleConnectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 200000000000000000000010 /* ScaleConnectionView.swift */; };
+		100000000000000000000011 /* ScaleDataParserTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 200000000000000000000011 /* ScaleDataParserTests.swift */; };
+		100000000000000000000012 /* WeightAnalyticsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 200000000000000000000012 /* WeightAnalyticsTests.swift */; };
+		100000000000000000000013 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 200000000000000000000016 /* Assets.xcassets */; };
+		100000000000000000000014 /* OnDeviceAIManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 200000000000000000000017 /* OnDeviceAIManager.swift */; };
+		100000000000000000000015 /* HealthKitManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 200000000000000000000018 /* HealthKitManager.swift */; };
+		100000000000000000000016 /* FoodVisionAnalyzer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20000000000000000000001A /* FoodVisionAnalyzer.swift */; };
+		100000000000000000000017 /* CoachNotificationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20000000000000000000001B /* CoachNotificationManager.swift */; };
+		100000000000000000000018 /* WeeklyCoachEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20000000000000000000001C /* WeeklyCoachEngine.swift */; };
+		100000000000000000000019 /* QwenAIService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20000000000000000000001D /* QwenAIService.swift */; };
+		10000000000000000000001A /* QwenConnectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20000000000000000000001E /* QwenConnectionView.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		300000000000000000000001 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 700000000000000000000001 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 600000000000000000000001;
+			remoteInfo = Diet;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		200000000000000000000001 /* DietApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DietApp.swift; sourceTree = "<group>"; };
+		200000000000000000000002 /* WeightRecord.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Models/WeightRecord.swift; sourceTree = "<group>"; };
+		200000000000000000000003 /* MealRecord.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Models/MealRecord.swift; sourceTree = "<group>"; };
+		200000000000000000000004 /* ScaleDataParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Services/ScaleDataParser.swift; sourceTree = "<group>"; };
+		200000000000000000000005 /* BluetoothScaleManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Services/BluetoothScaleManager.swift; sourceTree = "<group>"; };
+		200000000000000000000006 /* AppTheme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Design/AppTheme.swift; sourceTree = "<group>"; };
+		200000000000000000000007 /* WeightChart.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/Components/WeightChart.swift; sourceTree = "<group>"; };
+		200000000000000000000008 /* MealPhoto.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/Components/MealPhoto.swift; sourceTree = "<group>"; };
+		200000000000000000000009 /* RootTabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/RootTabView.swift; sourceTree = "<group>"; };
+		20000000000000000000000A /* DashboardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/DashboardView.swift; sourceTree = "<group>"; };
+		20000000000000000000000B /* MealsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/MealsView.swift; sourceTree = "<group>"; };
+		20000000000000000000000C /* ProgressView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/ProgressView.swift; sourceTree = "<group>"; };
+		20000000000000000000000D /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/SettingsView.swift; sourceTree = "<group>"; };
+		20000000000000000000000E /* AddWeightSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/AddWeightSheet.swift; sourceTree = "<group>"; };
+		20000000000000000000000F /* AddMealView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/AddMealView.swift; sourceTree = "<group>"; };
+		200000000000000000000010 /* ScaleConnectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/ScaleConnectionView.swift; sourceTree = "<group>"; };
+		200000000000000000000011 /* ScaleDataParserTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScaleDataParserTests.swift; sourceTree = "<group>"; };
+		200000000000000000000012 /* WeightAnalyticsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeightAnalyticsTests.swift; sourceTree = "<group>"; };
+		200000000000000000000013 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		200000000000000000000014 /* Diet.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Diet.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		200000000000000000000015 /* DietTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = DietTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		200000000000000000000016 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		200000000000000000000017 /* OnDeviceAIManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Services/OnDeviceAIManager.swift; sourceTree = "<group>"; };
+		200000000000000000000018 /* HealthKitManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Services/HealthKitManager.swift; sourceTree = "<group>"; };
+		200000000000000000000019 /* Diet.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Diet.entitlements; sourceTree = "<group>"; };
+		20000000000000000000001A /* FoodVisionAnalyzer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Services/FoodVisionAnalyzer.swift; sourceTree = "<group>"; };
+		20000000000000000000001B /* CoachNotificationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Services/CoachNotificationManager.swift; sourceTree = "<group>"; };
+		20000000000000000000001C /* WeeklyCoachEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Services/WeeklyCoachEngine.swift; sourceTree = "<group>"; };
+		20000000000000000000001D /* QwenAIService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Services/QwenAIService.swift; sourceTree = "<group>"; };
+		20000000000000000000001E /* QwenConnectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/QwenConnectionView.swift; sourceTree = "<group>"; };
+		20000000000000000000001F /* Shared.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Shared.xcconfig; sourceTree = "<group>"; };
+		200000000000000000000020 /* Local.xcconfig.example */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Local.xcconfig.example; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		400000000000000000000001 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		400000000000000000000002 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		500000000000000000000001 = {
+			isa = PBXGroup;
+			children = (
+				500000000000000000000005 /* Config */,
+				500000000000000000000002 /* Diet */,
+				500000000000000000000003 /* DietTests */,
+				500000000000000000000004 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		500000000000000000000002 /* Diet */ = {
+			isa = PBXGroup;
+			children = (
+				200000000000000000000001 /* DietApp.swift */,
+				200000000000000000000002 /* WeightRecord.swift */,
+				200000000000000000000003 /* MealRecord.swift */,
+				200000000000000000000004 /* ScaleDataParser.swift */,
+				200000000000000000000005 /* BluetoothScaleManager.swift */,
+				200000000000000000000017 /* OnDeviceAIManager.swift */,
+				20000000000000000000001A /* FoodVisionAnalyzer.swift */,
+				20000000000000000000001B /* CoachNotificationManager.swift */,
+				20000000000000000000001C /* WeeklyCoachEngine.swift */,
+				20000000000000000000001D /* QwenAIService.swift */,
+				200000000000000000000018 /* HealthKitManager.swift */,
+				200000000000000000000019 /* Diet.entitlements */,
+				200000000000000000000006 /* AppTheme.swift */,
+				200000000000000000000007 /* WeightChart.swift */,
+				200000000000000000000008 /* MealPhoto.swift */,
+				200000000000000000000009 /* RootTabView.swift */,
+				20000000000000000000000A /* DashboardView.swift */,
+				20000000000000000000000B /* MealsView.swift */,
+				20000000000000000000000C /* ProgressView.swift */,
+				20000000000000000000000D /* SettingsView.swift */,
+				20000000000000000000000E /* AddWeightSheet.swift */,
+				20000000000000000000000F /* AddMealView.swift */,
+				200000000000000000000010 /* ScaleConnectionView.swift */,
+				20000000000000000000001E /* QwenConnectionView.swift */,
+				200000000000000000000016 /* Assets.xcassets */,
+				200000000000000000000013 /* Info.plist */,
+			);
+			path = Diet;
+			sourceTree = "<group>";
+		};
+		500000000000000000000003 /* DietTests */ = {
+			isa = PBXGroup;
+			children = (
+				200000000000000000000011 /* ScaleDataParserTests.swift */,
+				200000000000000000000012 /* WeightAnalyticsTests.swift */,
+			);
+			path = DietTests;
+			sourceTree = "<group>";
+		};
+		500000000000000000000004 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				200000000000000000000014 /* Diet.app */,
+				200000000000000000000015 /* DietTests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		500000000000000000000005 /* Config */ = {
+			isa = PBXGroup;
+			children = (
+				20000000000000000000001F /* Shared.xcconfig */,
+				200000000000000000000020 /* Local.xcconfig.example */,
+			);
+			path = Config;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		600000000000000000000001 /* Diet */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 900000000000000000000002 /* Build configuration list for PBXNativeTarget "Diet" */;
+			buildPhases = (
+				400000000000000000000003 /* Sources */,
+				400000000000000000000001 /* Frameworks */,
+				400000000000000000000005 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = Diet;
+			productName = Diet;
+			productReference = 200000000000000000000014 /* Diet.app */;
+			productType = "com.apple.product-type.application";
+		};
+		600000000000000000000002 /* DietTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 900000000000000000000003 /* Build configuration list for PBXNativeTarget "DietTests" */;
+			buildPhases = (
+				400000000000000000000004 /* Sources */,
+				400000000000000000000002 /* Frameworks */,
+				400000000000000000000006 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				300000000000000000000002 /* PBXTargetDependency */,
+			);
+			name = DietTests;
+			productName = DietTests;
+			productReference = 200000000000000000000015 /* DietTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		700000000000000000000001 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 2660;
+				LastUpgradeCheck = 2660;
+				TargetAttributes = {
+					600000000000000000000001 = {
+						CreatedOnToolsVersion = 26.6;
+						SystemCapabilities = {
+							com.apple.HealthKit = {
+								enabled = 1;
+							};
+						};
+					};
+					600000000000000000000002 = {
+						CreatedOnToolsVersion = 26.6;
+						TestTargetID = 600000000000000000000001;
+					};
+				};
+			};
+			buildConfigurationList = 900000000000000000000001 /* Build configuration list for PBXProject "Diet" */;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = zh_CN;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				Base,
+				en,
+				zh_CN,
+			);
+			mainGroup = 500000000000000000000001;
+			productRefGroup = 500000000000000000000004 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				600000000000000000000001 /* Diet */,
+				600000000000000000000002 /* DietTests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		400000000000000000000005 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				100000000000000000000013 /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		400000000000000000000006 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		400000000000000000000003 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				100000000000000000000001 /* DietApp.swift in Sources */,
+				100000000000000000000002 /* WeightRecord.swift in Sources */,
+				100000000000000000000003 /* MealRecord.swift in Sources */,
+				100000000000000000000004 /* ScaleDataParser.swift in Sources */,
+				100000000000000000000005 /* BluetoothScaleManager.swift in Sources */,
+				100000000000000000000014 /* OnDeviceAIManager.swift in Sources */,
+				100000000000000000000016 /* FoodVisionAnalyzer.swift in Sources */,
+				100000000000000000000017 /* CoachNotificationManager.swift in Sources */,
+				100000000000000000000018 /* WeeklyCoachEngine.swift in Sources */,
+				100000000000000000000019 /* QwenAIService.swift in Sources */,
+				100000000000000000000015 /* HealthKitManager.swift in Sources */,
+				100000000000000000000006 /* AppTheme.swift in Sources */,
+				100000000000000000000007 /* WeightChart.swift in Sources */,
+				100000000000000000000008 /* MealPhoto.swift in Sources */,
+				100000000000000000000009 /* RootTabView.swift in Sources */,
+				10000000000000000000000A /* DashboardView.swift in Sources */,
+				10000000000000000000000B /* MealsView.swift in Sources */,
+				10000000000000000000000C /* ProgressView.swift in Sources */,
+				10000000000000000000000D /* SettingsView.swift in Sources */,
+				10000000000000000000000E /* AddWeightSheet.swift in Sources */,
+				10000000000000000000000F /* AddMealView.swift in Sources */,
+				100000000000000000000010 /* ScaleConnectionView.swift in Sources */,
+				10000000000000000000001A /* QwenConnectionView.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		400000000000000000000004 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				100000000000000000000011 /* ScaleDataParserTests.swift in Sources */,
+				100000000000000000000012 /* WeightAnalyticsTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		300000000000000000000002 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 600000000000000000000001 /* Diet */;
+			targetProxy = 300000000000000000000001 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		800000000000000000000001 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		800000000000000000000002 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		800000000000000000000003 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 20000000000000000000001F /* Shared.xcconfig */;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CODE_SIGN_ENTITLEMENTS = Diet/Diet.entitlements;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_ASSET_PATHS = "";
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = Diet/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Debug;
+		};
+		800000000000000000000004 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 20000000000000000000001F /* Shared.xcconfig */;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CODE_SIGN_ENTITLEMENTS = Diet/Diet.entitlements;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_ASSET_PATHS = "";
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = Diet/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Release;
+		};
+		800000000000000000000005 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 20000000000000000000001F /* Shared.xcconfig */;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = "$(TEST_PRODUCT_BUNDLE_IDENTIFIER)";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Diet.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Diet";
+			};
+			name = Debug;
+		};
+		800000000000000000000006 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 20000000000000000000001F /* Shared.xcconfig */;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = "$(TEST_PRODUCT_BUNDLE_IDENTIFIER)";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Diet.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Diet";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		900000000000000000000001 /* Build configuration list for PBXProject "Diet" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				800000000000000000000001 /* Debug */,
+				800000000000000000000002 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		900000000000000000000002 /* Build configuration list for PBXNativeTarget "Diet" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				800000000000000000000003 /* Debug */,
+				800000000000000000000004 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		900000000000000000000003 /* Build configuration list for PBXNativeTarget "DietTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				800000000000000000000005 /* Debug */,
+				800000000000000000000006 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 700000000000000000000001 /* Project object */;
+}

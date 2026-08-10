@@ -1,0 +1,22 @@
+DerivedData/
+build/
+*.xcuserstate
+xcuserdata/
+.DS_Store
+
+# Local signing and credentials
+Config/Local.xcconfig
+.env
+.env.*
+!.env.example
+*.mobileprovision
+*.p12
+*.cer
+*.pem
+*.key
+
+# Generated archives, test results, and temporary QR images
+*.ipa
+*.xcarchive
+*.xcresult
+*qwen-config*.png
