@@ -6,6 +6,8 @@ A modern, local-first iOS weight and meal tracker. It syncs compatible Bluetooth
 
 [中文](#中文) · [English](#english)
 
+许可证 / License：[MIT](LICENSE)
+
 ---
 
 ## 中文
@@ -121,7 +123,7 @@ xcodebuild test \
 - 照片热量是图像与份量推断出的区间估算；隐藏的油、糖、酱料和容器深度都会造成误差。
 - AI 建议用于行为反馈，不替代医生、注册营养师或其他专业医疗建议。
 - 云端请求会产生千问按量付费费用，请在平台的用量分析中设置预算与告警。
-- 本仓库尚未选择开源许可证。在公开仓库前应添加 `LICENSE`；在此之前默认保留全部权利。
+- 本项目采用 [MIT License](LICENSE)；使用、修改或分发时请保留版权与许可证声明。
 
 ---
 
@@ -238,4 +240,4 @@ The simulator covers parsers and business logic, but it cannot validate a physic
 - Photo-based calories are interval estimates. Hidden oil, sugar, sauces, and container depth can materially change the result.
 - AI coaching is for behavioral feedback and is not medical or nutritional advice.
 - Cloud calls incur Qwen pay-as-you-go charges. Configure usage budgets and alerts in the platform console.
-- No open-source license has been selected yet. Add a `LICENSE` file before making the repository public; all rights are reserved until then.
+- This project is available under the [MIT License](LICENSE). Keep the copyright and license notices when using, modifying, or distributing it.
