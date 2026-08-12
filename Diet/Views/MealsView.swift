@@ -515,6 +515,7 @@ private struct MealDetailView: View {
 private struct MealCorrectionSheet: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(\.modelContext) private var modelContext
+    @EnvironmentObject private var qwenAIService: QwenAIService
 
     let meal: MealRecord
 
@@ -524,6 +525,11 @@ private struct MealCorrectionSheet: View {
     @State private var portion: MealPortion
     @State private var caloriesLow: Int
     @State private var caloriesHigh: Int
+    @State private var isRefining = false
+    @State private var refinementResult: MealRefinementResult?
+    @State private var refinementPreviousRange: String?
+    @State private var refinementError: String?
+    @State private var showingRefinementFailureConfirmation = false
 
     init(meal: MealRecord) {
         self.meal = meal
@@ -550,6 +556,7 @@ private struct MealCorrectionSheet: View {
                             ForEach(tags, id: \.self) { tag in
                                 Button {
                                     tags.removeAll { $0 == tag }
+                                    invalidateRefinement()
                                 } label: {
                                     HStack(spacing: 5) {
                                         Text(tag).lineLimit(1)
@@ -602,6 +609,7 @@ private struct MealCorrectionSheet: View {
                                     } else {
                                         selectedGroups.insert(group)
                                     }
+                                    invalidateRefinement()
                                 } label: {
                                     Text(group.title)
                                         .font(.caption.weight(.semibold))
@@ -639,6 +647,80 @@ private struct MealCorrectionSheet: View {
                                 .foregroundStyle(AppTheme.secondaryInk)
                             calorieField(title: "上限", value: $caloriesHigh)
                         }
+
+                        Divider()
+
+                        if qwenAIService.isConfigured {
+                            Button {
+                                refineCalories()
+                            } label: {
+                                HStack(spacing: 9) {
+                                    if isRefining {
+                                        ProgressView()
+                                            .tint(.white)
+                                    } else {
+                                        Image(systemName: "sparkles")
+                                    }
+                                    Text(isRefining ? "Qwen 正在重新估算…" : "根据修改重新估算")
+                                    Spacer()
+                                    if !isRefining {
+                                        Image(systemName: "arrow.clockwise")
+                                    }
+                                }
+                                .font(.subheadline.weight(.semibold))
+                                .foregroundStyle(.white)
+                                .padding(.horizontal, 15)
+                                .padding(.vertical, 13)
+                                .background(AppTheme.ink, in: RoundedRectangle(cornerRadius: 15))
+                            }
+                            .buttonStyle(.plain)
+                            .disabled(!canRefine || isRefining)
+
+                            Text("也可以直接点右上角“重估并保存”，Qwen 会按你确认的食物自动更新热量。")
+                                .font(.caption)
+                                .foregroundStyle(AppTheme.secondaryInk)
+                                .fixedSize(horizontal: false, vertical: true)
+
+                            if let refinementResult {
+                                VStack(alignment: .leading, spacing: 9) {
+                                    Label("AI 已按你的确认重估", systemImage: "checkmark.seal.fill")
+                                        .font(.caption.weight(.semibold))
+                                    HStack(spacing: 7) {
+                                        Text(refinementPreviousRange ?? "原热量")
+                                            .strikethrough()
+                                            .foregroundStyle(AppTheme.secondaryInk)
+                                        Image(systemName: "arrow.right")
+                                            .font(.caption2.bold())
+                                        Text("\(refinementResult.caloriesLow)–\(refinementResult.caloriesHigh) 千卡")
+                                            .fontWeight(.semibold)
+                                    }
+                                    .font(.subheadline)
+                                    Text(refinementResult.summary)
+                                        .font(.caption)
+                                        .foregroundStyle(AppTheme.secondaryInk)
+                                        .fixedSize(horizontal: false, vertical: true)
+                                }
+                                .foregroundStyle(AppTheme.ink)
+                                .padding(13)
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                                .background(AppTheme.paleLime, in: RoundedRectangle(cornerRadius: 15))
+                            }
+
+                            if let refinementError {
+                                Label(refinementError, systemImage: "exclamationmark.triangle.fill")
+                                    .font(.caption)
+                                    .foregroundStyle(AppTheme.coral)
+                                    .fixedSize(horizontal: false, vertical: true)
+                            }
+                        } else {
+                            Label(
+                                "连接 Qwen 后可根据你确认的食物重新估算；现在仍可直接手动保存。",
+                                systemImage: "lock.fill"
+                            )
+                            .font(.caption)
+                            .foregroundStyle(AppTheme.secondaryInk)
+                            .fixedSize(horizontal: false, vertical: true)
+                        }
                     }
 
                     Label(
@@ -661,10 +743,18 @@ private struct MealCorrectionSheet: View {
                     Button("取消") { dismiss() }
                 }
                 ToolbarItem(placement: .confirmationAction) {
-                    Button("保存") { save() }
+                    Button(isRefining ? "重估中…" : shouldRefineBeforeSaving ? "重估并保存" : "保存") {
+                        saveRequested()
+                    }
                         .fontWeight(.semibold)
-                        .disabled(!canSave)
+                        .disabled(!canSave || isRefining)
                 }
+            }
+            .alert("AI 重估未完成", isPresented: $showingRefinementFailureConfirmation) {
+                Button("保留手动热量并保存") { save() }
+                Button("继续修改", role: .cancel) {}
+            } message: {
+                Text(refinementError ?? "暂时无法完成热量重估，你可以稍后重试或保留当前手动热量。")
             }
         }
     }
@@ -719,6 +809,18 @@ private struct MealCorrectionSheet: View {
             && caloriesHigh <= 4_000
     }
 
+    private var canRefine: Bool {
+        !tags.isEmpty
+            && !selectedGroups.isEmpty
+            && meal.photoData != nil
+    }
+
+    private var shouldRefineBeforeSaving: Bool {
+        qwenAIService.isConfigured
+            && canRefine
+            && refinementResult == nil
+    }
+
     private func addTag() {
         let value = String(cleanedNewTag.prefix(12))
         guard !value.isEmpty, !tags.contains(value) else {
@@ -727,21 +829,86 @@ private struct MealCorrectionSheet: View {
         }
         tags.append(value)
         newTag = ""
+        invalidateRefinement()
     }
 
     private func rescaleCalories(from oldPortion: MealPortion, to newPortion: MealPortion) {
         let ratio = newPortion.factor / max(oldPortion.factor, 0.01)
         caloriesLow = max(0, Int((Double(caloriesLow) * ratio / 10).rounded() * 10))
         caloriesHigh = max(caloriesLow, Int((Double(caloriesHigh) * ratio / 10).rounded() * 10))
+        invalidateRefinement()
     }
 
-    private func save() {
+    private func invalidateRefinement() {
+        refinementResult = nil
+        refinementPreviousRange = nil
+        refinementError = nil
+    }
+
+    private func saveRequested() {
+        if shouldRefineBeforeSaving {
+            refineCalories(saveAfterSuccess: true)
+        } else {
+            save()
+        }
+    }
+
+    private func refineCalories(saveAfterSuccess: Bool = false) {
+        guard let imageData = meal.photoData, canRefine else { return }
+        let confirmedTags = tags
+        let confirmedGroups = FoodGroup.allCases.filter(selectedGroups.contains)
+        let confirmedPortion = portion
+        let previousRange = "\(caloriesLow)–\(caloriesHigh) 千卡"
+
+        isRefining = true
+        refinementError = nil
+
+        Task {
+            do {
+                let result = try await qwenAIService.refineMeal(
+                    imageData: imageData,
+                    confirmedTags: confirmedTags,
+                    confirmedGroups: confirmedGroups,
+                    portion: confirmedPortion
+                )
+                let currentGroups = FoodGroup.allCases.filter(selectedGroups.contains)
+                guard tags == confirmedTags,
+                      currentGroups == confirmedGroups,
+                      portion == confirmedPortion
+                else {
+                    refinementError = "修改内容已经变化，请按当前结果重新估算一次。"
+                    isRefining = false
+                    return
+                }
+                refinementPreviousRange = previousRange
+                refinementResult = result
+                caloriesLow = result.caloriesLow
+                caloriesHigh = result.caloriesHigh
+                isRefining = false
+                if saveAfterSuccess {
+                    save(refinement: result)
+                }
+                return
+            } catch {
+                refinementResult = nil
+                refinementPreviousRange = nil
+                refinementError = "重估失败，已保留当前手动热量。\(error.localizedDescription)"
+                if saveAfterSuccess {
+                    showingRefinementFailureConfirmation = true
+                }
+            }
+            isRefining = false
+        }
+    }
+
+    private func save(refinement: MealRefinementResult? = nil) {
         meal.applyCorrection(
             tags: tags,
             groups: FoodGroup.allCases.filter(selectedGroups.contains),
             portion: portion,
             caloriesLow: caloriesLow,
-            caloriesHigh: caloriesHigh
+            caloriesHigh: caloriesHigh,
+            refinement: refinement ?? refinementResult
         )
         try? modelContext.save()
         UINotificationFeedbackGenerator().notificationOccurred(.success)

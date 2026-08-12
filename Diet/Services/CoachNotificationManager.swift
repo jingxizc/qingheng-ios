@@ -25,7 +25,7 @@ final class CoachNotificationManager: ObservableObject {
             switch self {
             case .unknown: "开启后每天最多收到一条与当前记录有关的提醒。"
             case .requesting: "请在系统弹窗中选择是否允许轻衡发送通知。"
-            case .authorized: "周一至周六发送今日一步，周日改为本周复盘。"
+            case .authorized: "每天早上结合昨日饮食、运动、睡眠和体重趋势生成一条晨报。"
             case .denied: "请在系统设置中允许轻衡通知后再开启。"
             case .failed: "系统没有完成提醒设置，可以稍后再试。"
             }
@@ -48,7 +48,9 @@ final class CoachNotificationManager: ObservableObject {
 
     private let center = UNUserNotificationCenter.current()
     private static let requestPrefix = "qingheng.coach."
-    private static let requestIdentifiers = (1...7).map { "\(requestPrefix)weekday.\($0)" }
+    private static let morningIdentifiers = (0..<7).map { "\(requestPrefix)morning.\($0)" }
+    private static let legacyIdentifiers = (1...7).map { "\(requestPrefix)weekday.\($0)" }
+    private static let requestIdentifiers = morningIdentifiers + legacyIdentifiers
 
     func refreshAuthorizationStatus() async {
         let settings = await center.notificationSettings()
@@ -77,11 +79,12 @@ final class CoachNotificationManager: ObservableObject {
     }
 
     func updateSchedule(
-        context: CoachContext,
-        weeklyReport: WeeklyCoachReport,
+        morningBrief: CoachBrief,
         enabled: Bool,
         hour: Int,
-        minute: Int
+        minute: Int,
+        now: Date = .now,
+        calendar: Calendar = .current
     ) async {
         guard enabled else {
             removeScheduledReminders()
@@ -98,49 +101,46 @@ final class CoachNotificationManager: ObservableObject {
 
         let safeHour = min(max(hour, 0), 23)
         let safeMinute = min(max(minute, 0), 59)
-        let dailyBrief = LocalCoachEngine.brief(for: context)
+        let firstDate = Self.nextReminderDate(
+            hour: safeHour,
+            minute: safeMinute,
+            now: now,
+            calendar: calendar
+        )
 
         do {
-            for weekday in 2...7 {
+            for offset in 0..<7 {
+                guard let date = calendar.date(byAdding: .day, value: offset, to: firstDate) else {
+                    continue
+                }
                 let content = UNMutableNotificationContent()
-                content.title = dailyBrief.headline
-                content.body = String(dailyBrief.message.prefix(110))
+                if offset == 0 {
+                    content.title = "轻衡晨报 · \(morningBrief.headline)"
+                    content.body = String(morningBrief.message.prefix(150))
+                    content.userInfo = [
+                        "destination": "today",
+                        "coachSource": morningBrief.source.title
+                    ]
+                } else {
+                    content.title = "轻衡晨报"
+                    content.body = "打开轻衡后，我会用最新的昨日饮食、运动、睡眠和体重趋势更新今天的一步建议。"
+                    content.userInfo = ["destination": "today"]
+                }
                 content.sound = .default
                 content.threadIdentifier = "qingheng.coach"
-                content.userInfo = ["destination": "today"]
 
                 try await center.add(
                     request(
-                        identifier: "\(Self.requestPrefix)weekday.\(weekday)",
-                        weekday: weekday,
-                        hour: safeHour,
-                        minute: safeMinute,
+                        identifier: Self.morningIdentifiers[offset],
+                        date: date,
+                        calendar: calendar,
                         content: content
                     )
                 )
             }
 
-            let weeklyContent = UNMutableNotificationContent()
-            weeklyContent.title = "轻衡 · 本周复盘"
-            weeklyContent.body = String(
-                "\(weeklyReport.headline)：\(weeklyReport.nextGoal)".prefix(110)
-            )
-            weeklyContent.sound = .default
-            weeklyContent.threadIdentifier = "qingheng.coach"
-            weeklyContent.userInfo = ["destination": "weeklyReport"]
-
-            try await center.add(
-                request(
-                    identifier: "\(Self.requestPrefix)weekday.1",
-                    weekday: 1,
-                    hour: safeHour,
-                    minute: safeMinute,
-                    content: weeklyContent
-                )
-            )
-
             scheduledSummary = String(
-                format: "每天 %02d:%02d · 周日发送周报",
+                format: "每天 %02d:%02d · 优先发送昨日复盘晨报",
                 safeHour,
                 safeMinute
             )
@@ -157,22 +157,39 @@ final class CoachNotificationManager: ObservableObject {
 
     private func request(
         identifier: String,
-        weekday: Int,
-        hour: Int,
-        minute: Int,
+        date: Date,
+        calendar: Calendar,
         content: UNNotificationContent
     ) -> UNNotificationRequest {
-        var components = DateComponents()
-        components.calendar = .current
-        components.timeZone = .current
-        components.weekday = weekday
-        components.hour = hour
-        components.minute = minute
+        var components = calendar.dateComponents(
+            [.calendar, .timeZone, .year, .month, .day, .hour, .minute],
+            from: date
+        )
+        components.second = 0
 
         return UNNotificationRequest(
             identifier: identifier,
             content: content,
-            trigger: UNCalendarNotificationTrigger(dateMatching: components, repeats: true)
+            trigger: UNCalendarNotificationTrigger(dateMatching: components, repeats: false)
         )
+    }
+
+    nonisolated static func nextReminderDate(
+        hour: Int,
+        minute: Int,
+        now: Date,
+        calendar: Calendar
+    ) -> Date {
+        let safeHour = min(max(hour, 0), 23)
+        let safeMinute = min(max(minute, 0), 59)
+        let today = calendar.date(
+            bySettingHour: safeHour,
+            minute: safeMinute,
+            second: 0,
+            of: now
+        ) ?? now
+        if today > now { return today }
+        return calendar.date(byAdding: .day, value: 1, to: today)
+            ?? now.addingTimeInterval(86_400)
     }
 }

@@ -30,6 +30,8 @@
 	<string>轻衡使用 Face ID 保护云端 AI 连接的更换与移除。</string>
 	<key>NSHealthUpdateUsageDescription</key>
 	<string>轻衡需要将你确认的体重记录同步到 Apple 健康，方便统一查看体重趋势。</string>
+	<key>NSHealthShareUsageDescription</key>
+	<string>轻衡读取步数、活动能量、锻炼时长和睡眠时段，用于生成前一天的复盘和晨间建议。</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>轻衡需要从相册选择饮食照片。</string>
 	<key>UIApplicationSceneManifest</key>

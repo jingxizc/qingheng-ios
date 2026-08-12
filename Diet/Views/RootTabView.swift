@@ -17,8 +17,9 @@ struct RootTabView: View {
     @AppStorage("healthKitSyncEnabled") private var healthKitSyncEnabled = false
     @AppStorage("targetWeight") private var targetWeight = 65.0
     @AppStorage("coachRemindersEnabled") private var coachRemindersEnabled = false
-    @AppStorage("coachReminderHour") private var coachReminderHour = 20
-    @AppStorage("coachReminderMinute") private var coachReminderMinute = 30
+    @AppStorage("coachReminderHour") private var coachReminderHour = 8
+    @AppStorage("coachReminderMinute") private var coachReminderMinute = 0
+    @AppStorage("morningCoachMigrationVersion") private var morningCoachMigrationVersion = 0
     @State private var selectedTab = 0
     @State private var syncToast: String?
     @State private var syncToastSymbol = "checkmark.circle.fill"
@@ -56,6 +57,7 @@ struct RootTabView: View {
             }
         }
         .onAppear {
+            migrateReminderTimeIfNeeded()
             if autoBluetoothSync {
                 scaleManager.startMonitoring()
             }
@@ -66,24 +68,57 @@ struct RootTabView: View {
         .task {
             await qwenAIService.refreshConnectionIfConfigured()
         }
+        .task {
+            guard healthKitManager.wellnessReadEnabled else { return }
+            healthKitManager.startWellnessBackgroundDelivery()
+            await healthKitManager.refreshPreviousDaySummary()
+        }
         .task(id: reminderScheduleKey) {
-            let reminderNow = Calendar.current.date(
-                bySettingHour: coachReminderHour,
+            guard coachRemindersEnabled else {
+                coachNotificationManager.removeScheduledReminders()
+                return
+            }
+            let calendar = Calendar.current
+            let reminderNow = Date.now
+            let reminderDate = CoachNotificationManager.nextReminderDate(
+                hour: coachReminderHour,
                 minute: coachReminderMinute,
-                second: 0,
-                of: .now
-            ) ?? .now
+                now: reminderNow,
+                calendar: calendar
+            )
+            let reviewDay = calendar.date(byAdding: .day, value: -1, to: reminderDate)
+                ?? reminderDate
+            let healthSummary: DailyHealthSummary?
+            if healthKitManager.wellnessReadEnabled {
+                healthSummary = try? await healthKitManager.dailySummary(
+                    for: reviewDay,
+                    calendar: calendar
+                )
+            } else {
+                healthSummary = nil
+            }
+            let context = CoachContext.make(
+                weights: weights,
+                meals: meals,
+                targetWeight: targetWeight,
+                previousDayHealth: healthSummary,
+                now: reminderDate,
+                calendar: calendar
+            )
+            let fallback = LocalCoachEngine.brief(for: context)
+            let morningBrief: CoachBrief
+            if let cloudBrief = await qwenAIService.coachBrief(for: context, fallback: fallback) {
+                morningBrief = cloudBrief
+            } else {
+                morningBrief = await aiManager.coachBrief(for: context)
+            }
             await coachNotificationManager.updateSchedule(
-                context: CoachContext.make(
-                    weights: weights,
-                    meals: meals,
-                    targetWeight: targetWeight,
-                    now: reminderNow
-                ),
-                weeklyReport: WeeklyCoachEngine.makeReport(weights: weights, meals: meals),
+                morningBrief: morningBrief,
                 enabled: coachRemindersEnabled,
                 hour: coachReminderHour,
-                minute: coachReminderMinute
+                minute: coachReminderMinute,
+                now: reminderNow,
+                calendar: calendar
             )
         }
         .onChange(of: autoBluetoothSync) { _, enabled in
@@ -184,6 +219,15 @@ struct RootTabView: View {
         let mealState = meals
             .map { "\($0.id.uuidString):\($0.analysisVersion)" }
             .joined(separator: ",")
-        return "\(coachRemindersEnabled)-\(coachReminderHour)-\(coachReminderMinute)-\(targetWeight)-\(weightState)-\(mealState)"
+        return "\(coachRemindersEnabled)-\(coachReminderHour)-\(coachReminderMinute)-\(targetWeight)-\(weightState)-\(mealState)-\(healthKitManager.healthDataRevision)-\(qwenAIService.isCloudReady)"
+    }
+
+    private func migrateReminderTimeIfNeeded() {
+        guard morningCoachMigrationVersion < 1 else { return }
+        if coachReminderHour == 20, coachReminderMinute == 30 {
+            coachReminderHour = 8
+            coachReminderMinute = 0
+        }
+        morningCoachMigrationVersion = 1
     }
 }

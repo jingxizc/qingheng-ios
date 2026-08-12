@@ -17,8 +17,8 @@ struct SettingsView: View {
     @AppStorage("autoBluetoothSync") private var autoBluetoothSync = true
     @AppStorage("healthKitSyncEnabled") private var healthKitSyncEnabled = false
     @AppStorage("coachRemindersEnabled") private var coachRemindersEnabled = false
-    @AppStorage("coachReminderHour") private var coachReminderHour = 20
-    @AppStorage("coachReminderMinute") private var coachReminderMinute = 30
+    @AppStorage("coachReminderHour") private var coachReminderHour = 8
+    @AppStorage("coachReminderMinute") private var coachReminderMinute = 0
 
     @State private var showingScale = false
     @State private var showingQwenConnection = false
@@ -220,7 +220,7 @@ struct SettingsView: View {
             VStack(alignment: .leading, spacing: 7) {
                 Label("本地降级：\(aiManager.state.title)", systemImage: aiManager.state.symbol)
                     .foregroundStyle(AppTheme.ink)
-                Text("连接后，饮食照片、今日建议和周报优先使用 Qwen；断网或接口异常时自动回退到 Apple Vision、Apple 端侧模型和本地规则。")
+                Text("连接后，饮食照片、昨日复盘晨报和周报优先使用 Qwen；断网或接口异常时自动回退到 Apple Vision、Apple 端侧模型和本地规则。")
                     .foregroundStyle(AppTheme.secondaryInk)
             }
             .font(.caption2)
@@ -261,7 +261,7 @@ struct SettingsView: View {
                 VStack(alignment: .leading, spacing: 3) {
                     Text("自适应每日提醒")
                         .font(.subheadline.weight(.semibold))
-                    Text("根据是否称重、记录饮食和本周趋势选择一句提醒")
+                    Text("早上复盘前一天的饮食、运动、睡眠和体重趋势")
                         .font(.caption)
                         .foregroundStyle(AppTheme.secondaryInk)
                 }
@@ -281,8 +281,8 @@ struct SettingsView: View {
 
                 Label(
                     coachNotificationManager.scheduledSummary
-                        ?? "每天最多一条，周日改为本周复盘",
-                    systemImage: "moon.stars.fill"
+                        ?? "每天最多一条，后台更新受 iOS 调度影响",
+                    systemImage: "sunrise.fill"
                 )
                 .font(.caption)
                 .foregroundStyle(AppTheme.secondaryInk)
@@ -303,7 +303,7 @@ struct SettingsView: View {
                 .foregroundStyle(AppTheme.ink)
             }
 
-            Label("提醒内容只使用本机摘要，不会上传体重或照片", systemImage: "lock.fill")
+            Label("不会上传照片或 HealthKit 原始样本；Qwen 仅接收生成建议所需的文字摘要", systemImage: "lock.fill")
                 .font(.caption2)
                 .foregroundStyle(AppTheme.secondaryInk)
         }
@@ -394,6 +394,36 @@ struct SettingsView: View {
             .tint(AppTheme.mint)
             .disabled(healthKitManager.state == .unavailable || healthKitManager.state.isBusy)
 
+            Divider().overlay(AppTheme.divider)
+
+            Toggle(isOn: wellnessReadBinding) {
+                VStack(alignment: .leading, spacing: 3) {
+                    Text("用于昨日复盘与晨报")
+                        .font(.subheadline.weight(.semibold))
+                    Text("只读取步数、活动能量、锻炼时长和睡眠时段")
+                        .font(.caption)
+                        .foregroundStyle(AppTheme.secondaryInk)
+                }
+            }
+            .tint(AppTheme.mint)
+            .disabled(healthKitManager.state == .unavailable || healthKitManager.state.isBusy)
+
+            if healthKitManager.wellnessReadEnabled {
+                Label(
+                    healthKitManager.latestDailySummary?.compactText
+                        ?? "已允许读取；没有数据的项目会在晨报中标记为缺失",
+                    systemImage: "figure.walk.motion"
+                )
+                .font(.caption)
+                .foregroundStyle(AppTheme.secondaryInk)
+                .fixedSize(horizontal: false, vertical: true)
+
+                Text("数据先在本机汇总；若已连接 Qwen，晨报会发送这些汇总数字，不会上传 HealthKit 原始样本。")
+                    .font(.caption2)
+                    .foregroundStyle(AppTheme.secondaryInk)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+
             if healthKitManager.state == .authorized {
                 Button {
                     Task {
@@ -423,7 +453,7 @@ struct SettingsView: View {
                     .fixedSize(horizontal: false, vertical: true)
             }
 
-            Label("轻衡不会读取步数、心率或其他健康数据", systemImage: "hand.raised.fill")
+            Label("不会读取心率、病历等信息；关闭后轻衡会停止查询运动与睡眠", systemImage: "hand.raised.fill")
                 .font(.caption2)
                 .foregroundStyle(AppTheme.secondaryInk)
         }
@@ -447,6 +477,21 @@ struct SettingsView: View {
 
                 Task {
                     healthKitSyncEnabled = await healthKitManager.requestAuthorization()
+                }
+            }
+        )
+    }
+
+    private var wellnessReadBinding: Binding<Bool> {
+        Binding(
+            get: { healthKitManager.wellnessReadEnabled },
+            set: { enabled in
+                guard enabled else {
+                    healthKitManager.disableWellnessReading()
+                    return
+                }
+                Task {
+                    _ = await healthKitManager.requestWellnessAuthorization()
                 }
             }
         )
@@ -494,7 +539,7 @@ struct SettingsView: View {
             VStack(alignment: .leading, spacing: 5) {
                 Text("数据留在你的手机")
                     .font(.subheadline.weight(.bold))
-                Text("体重和饮食照片默认只保存在本机，不需要注册账号。")
+                Text("体重、饮食照片及健康摘要默认保存在本机；启用 Qwen 教练时只上传生成建议所需的文字摘要，不上传健康原始样本。")
                     .font(.caption)
                     .foregroundStyle(AppTheme.secondaryInk)
                     .fixedSize(horizontal: false, vertical: true)

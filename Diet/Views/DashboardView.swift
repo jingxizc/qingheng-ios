@@ -7,6 +7,7 @@ struct DashboardView: View {
     @EnvironmentObject private var scaleManager: BluetoothScaleManager
     @EnvironmentObject private var aiManager: OnDeviceAIManager
     @EnvironmentObject private var qwenAIService: QwenAIService
+    @EnvironmentObject private var healthKitManager: HealthKitManager
     @Query(sort: \WeightRecord.measuredAt, order: .reverse)
     private var weights: [WeightRecord]
     @Query(sort: \MealRecord.eatenAt, order: .reverse)
@@ -204,7 +205,7 @@ struct DashboardView: View {
     private var coachCard: some View {
         VStack(alignment: .leading, spacing: 17) {
             HStack {
-                Label("今日 AI 教练", systemImage: "apple.intelligence")
+                Label("昨日复盘 · AI 教练", systemImage: "apple.intelligence")
                     .font(.subheadline.weight(.bold))
                 Spacer()
                 if let coachBrief {
@@ -260,7 +261,12 @@ struct DashboardView: View {
                     .buttonStyle(.plain)
 
                     Button {
-                        Task { await refreshCoach() }
+                        Task {
+                            if healthKitManager.wellnessReadEnabled {
+                                await healthKitManager.refreshPreviousDaySummary()
+                            }
+                            await refreshCoach()
+                        }
                     } label: {
                         Image(systemName: "arrow.clockwise")
                             .font(.subheadline.weight(.bold))
@@ -270,6 +276,22 @@ struct DashboardView: View {
                     }
                     .buttonStyle(.plain)
                     .disabled(isRefreshingCoach)
+                }
+
+                if let health = healthKitManager.latestDailySummary, health.hasAnyData {
+                    Label(health.compactText, systemImage: "figure.walk.motion")
+                        .font(.caption)
+                        .foregroundStyle(.white.opacity(0.72))
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+
+                if coachBrief.source != .qwenCloud,
+                   qwenAIService.isConfigured,
+                   let fallbackReason = qwenAIService.lastFallbackReason {
+                    Label(fallbackReason, systemImage: "exclamationmark.triangle.fill")
+                        .font(.caption2)
+                        .foregroundStyle(AppTheme.lime.opacity(0.9))
+                        .fixedSize(horizontal: false, vertical: true)
                 }
 
                 Button {
@@ -293,7 +315,7 @@ struct DashboardView: View {
 
             HStack(spacing: 6) {
                 Image(systemName: "lock.fill")
-                Text("只读取轻衡里的体重与饮食摘要，不上传照片")
+                Text("Qwen 仅接收教练所需文字摘要，不上传饮食照片或健康原始样本")
             }
             .font(.caption2)
             .foregroundStyle(.white.opacity(0.55))
@@ -443,7 +465,8 @@ struct DashboardView: View {
         let mealState = todayMeals
             .map { "\($0.id.uuidString):\($0.analysisVersion)" }
             .joined(separator: ",")
-        return "\(Calendar.current.startOfDay(for: .now).timeIntervalSince1970)-\(latestWeight)-\(mealState)-\(qwenAIService.isCloudReady)"
+        let healthState = healthKitManager.latestDailySummary?.compactText ?? "no-health"
+        return "\(Calendar.current.startOfDay(for: .now).timeIntervalSince1970)-\(latestWeight)-\(mealState)-\(healthState)-\(qwenAIService.isCloudReady)"
     }
 
     private var weeklyReport: WeeklyCoachReport {
@@ -452,10 +475,15 @@ struct DashboardView: View {
 
     private func refreshCoach() async {
         isRefreshingCoach = true
+        if healthKitManager.wellnessReadEnabled,
+           healthKitManager.latestDailySummary == nil {
+            await healthKitManager.refreshPreviousDaySummary()
+        }
         let context = CoachContext.make(
             weights: weights,
             meals: meals,
-            targetWeight: targetWeight
+            targetWeight: targetWeight,
+            previousDayHealth: healthKitManager.latestDailySummary
         )
         let localFallback = LocalCoachEngine.brief(for: context)
         let localReport = WeeklyCoachEngine.makeReport(weights: weights, meals: meals)

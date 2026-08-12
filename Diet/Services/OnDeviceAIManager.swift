@@ -60,11 +60,19 @@ struct CoachContext: Equatable {
     let mealRecordingStreak: Int
     let weightDaysInLastSevenDays: Int
     let hour: Int
+    let previousDay: Date?
+    let previousDayMealCount: Int
+    let previousDayAnalyzedMealCount: Int
+    let previousDayCaloriesLow: Int?
+    let previousDayCaloriesHigh: Int?
+    let previousDayGroups: [FoodGroup]
+    let previousDayHealth: DailyHealthSummary?
 
     static func make(
         weights: [WeightRecord],
         meals: [MealRecord],
         targetWeight: Double,
+        previousDayHealth: DailyHealthSummary? = nil,
         now: Date = .now,
         calendar: Calendar = .current
     ) -> CoachContext {
@@ -97,6 +105,17 @@ struct CoachContext: Equatable {
         }
 
         let weightDays = Set(weeklyWeights.map { calendar.startOfDay(for: $0.measuredAt) })
+        let today = calendar.startOfDay(for: now)
+        let previousDay = calendar.date(byAdding: .day, value: -1, to: today)
+        let previousMeals = previousDay.map { day in
+            meals.filter { calendar.isDate($0.eatenAt, inSameDayAs: day) }
+        } ?? []
+        let previousLows = previousMeals.compactMap(\.estimatedCaloriesLow)
+        let previousHighs = previousMeals.compactMap(\.estimatedCaloriesHigh)
+        var seenPreviousGroups = Set<FoodGroup>()
+        let previousGroups = previousMeals
+            .flatMap(\.analysisGroups)
+            .filter { seenPreviousGroups.insert($0).inserted }
 
         return CoachContext(
             currentWeight: currentWeight,
@@ -110,7 +129,14 @@ struct CoachContext: Equatable {
             todayGroups: groups,
             mealRecordingStreak: streak,
             weightDaysInLastSevenDays: weightDays.count,
-            hour: calendar.component(.hour, from: now)
+            hour: calendar.component(.hour, from: now),
+            previousDay: previousDay,
+            previousDayMealCount: previousMeals.count,
+            previousDayAnalyzedMealCount: previousMeals.filter(\.hasAnalysis).count,
+            previousDayCaloriesLow: previousLows.isEmpty ? nil : previousLows.reduce(0, +),
+            previousDayCaloriesHigh: previousHighs.isEmpty ? nil : previousHighs.reduce(0, +),
+            previousDayGroups: previousGroups,
+            previousDayHealth: previousDayHealth
         )
     }
 
@@ -124,6 +150,14 @@ struct CoachContext: Equatable {
             caloriesText = "无估算"
         }
         let groupText = todayGroups.map(\.title).joined(separator: "、")
+        let previousCaloriesText: String
+        if let previousDayCaloriesLow, let previousDayCaloriesHigh {
+            previousCaloriesText = "照片估算 \(previousDayCaloriesLow)-\(previousDayCaloriesHigh) 千卡"
+        } else {
+            previousCaloriesText = "无完整热量估算"
+        }
+        let previousGroupText = previousDayGroups.map(\.title).joined(separator: "、")
+        let healthText = previousDayHealth?.compactText ?? "未授权或暂无数据"
 
         return """
         当前体重：\(weightText)；目标：\(String(format: "%.1f kg", targetWeight))
@@ -131,7 +165,14 @@ struct CoachContext: Equatable {
         今天称重：\(weighedToday ? "是" : "否")
         今天记录 \(todayMealCount) 餐，已分析 \(todayAnalyzedMealCount) 餐，\(caloriesText)
         已识别结构：\(groupText.isEmpty ? "无" : groupText)；饮食连续记录 \(mealRecordingStreak) 天
+        昨日饮食：记录 \(previousDayMealCount) 餐、已分析 \(previousDayAnalyzedMealCount) 餐，\(previousCaloriesText)
+        昨日餐盘结构：\(previousGroupText.isEmpty ? "无" : previousGroupText)
+        昨日运动与昨夜睡眠：\(healthText)
         """
+    }
+
+    var hasPreviousDayReviewData: Bool {
+        previousDayMealCount > 0 || previousDayHealth?.hasAnyData == true
     }
 }
 
@@ -148,6 +189,44 @@ enum LocalCoachEngine {
                 symbol: "scalemass.fill",
                 source: .localEngine
             )
+        }
+
+        if context.hour < 12, context.hasPreviousDayReviewData {
+            if let sleepMinutes = context.previousDayHealth?.sleepMinutes, sleepMinutes < 360 {
+                let sleepText = context.previousDayHealth?.sleepHoursText ?? "不足 6 小时"
+                return CoachBrief(
+                    headline: "昨夜恢复优先",
+                    message: "昨夜睡眠约 \(sleepText)，昨日记录 \(context.previousDayMealCount) 餐。今天先保持正常三餐，把高强度运动换成轻松步行。",
+                    actionTitle: "知道了",
+                    action: .none,
+                    symbol: "bed.double.fill",
+                    source: .localEngine
+                )
+            }
+
+            let steps = context.previousDayHealth?.steps ?? 0
+            let exercise = context.previousDayHealth?.exerciseMinutes ?? 0
+            if steps > 0, steps < 5_000, exercise < 20 {
+                return CoachBrief(
+                    headline: "今天补一点活动",
+                    message: "昨日约 \(steps.formatted()) 步、锻炼 \(exercise) 分钟，饮食记录 \(context.previousDayMealCount) 餐。今天找一个饭后走 15 分钟即可。",
+                    actionTitle: "知道了",
+                    action: .none,
+                    symbol: "figure.walk",
+                    source: .localEngine
+                )
+            }
+
+            if let health = context.previousDayHealth {
+                return CoachBrief(
+                    headline: "昨日节奏已整理",
+                    message: "\(health.compactText)，饮食记录 \(context.previousDayMealCount) 餐。今天只延续一个做得最稳的小习惯。",
+                    actionTitle: "查看趋势",
+                    action: .viewProgress,
+                    symbol: "sunrise.fill",
+                    source: .localEngine
+                )
+            }
         }
 
         if !context.weighedToday, context.hour < 14 {

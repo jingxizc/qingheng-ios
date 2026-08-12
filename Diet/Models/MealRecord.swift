@@ -129,7 +129,8 @@ final class MealRecord {
         groups: [FoodGroup],
         portion: MealPortion,
         caloriesLow: Int,
-        caloriesHigh: Int
+        caloriesHigh: Int,
+        refinement: MealRefinementResult? = nil
     ) {
         var seenTags = Set<String>()
         let cleanedTags = tags
@@ -145,8 +146,13 @@ final class MealRecord {
         analysisGroupsText = cleanedGroups.map(\.rawValue).joined(separator: "|")
         estimatedCaloriesLow = low
         estimatedCaloriesHigh = high
-        nutritionScore = FoodKnowledgeBase.nutritionScore(for: cleanedGroups, tags: cleanedTags)
-        analysisSummary = FoodKnowledgeBase.confirmedSummary(tags: cleanedTags, groups: cleanedGroups)
+        nutritionScore = refinement?.nutritionScore
+            ?? FoodKnowledgeBase.nutritionScore(for: cleanedGroups, tags: cleanedTags)
+        analysisSummary = refinement?.summary
+            ?? FoodKnowledgeBase.confirmedSummary(tags: cleanedTags, groups: cleanedGroups)
+        if let refinement {
+            analysisConfidence = refinement.confidence
+        }
         analyzedAt = analyzedAt ?? .now
         analysisVersion = max(2, analysisVersion + 1)
         isUserCorrected = true

@@ -20,10 +20,12 @@ A modern, local-first iOS weight and meal tracker. It syncs compatible Bluetooth
 - 必须手动绑定体重秤，并结合近期个人基线拒绝其他人的异常读数
 - 按日期组织的照片饮食日记，支持份量选择和手动纠正
 - Qwen3.7 Flash 识别食物、餐盘结构、热量区间及不确定项
+- 人工修正食物和份量后，可锁定确认内容并让 Qwen 重新估算热量
 - Apple Vision 本机饮食分析作为无网络降级方案
-- 今日 AI 教练与 7 日复盘，每次聚焦一个可执行行动
+- 昨日复盘 AI 教练与 7 日周报，每次聚焦一个可执行行动
+- 可选读取 Apple 健康中的步数、活动能量、锻炼时长和睡眠，生成次日晨间复盘
 - Apple Foundation Models 可用时提供端侧教练表达，本地规则始终兜底
-- 可选的每日教练提醒和周报提醒
+- 可选的次日晨报提醒；iOS 会尽力在后台用最新健康摘要更新内容
 - 7 / 30 / 90 天体重趋势
 - 写入 Apple 健康，支持历史补同步和同步标识去重
 
@@ -98,7 +100,7 @@ A modern, local-first iOS weight and meal tracker. It syncs compatible Bluetooth
 | 蓝牙体重秤广播 | 本机处理 | 不会 |
 | Qwen API Key | iOS Keychain，`WhenUnlockedThisDeviceOnly` | 仅作为请求鉴权发送给千问 |
 | 饮食照片 | 本机；连接 Qwen 后按需上传 | 仅在主动分析时上传至千问 |
-| 教练上下文 | 本机生成的最小摘要 | 连接 Qwen 后会发送体重、目标和近 7 日饮食摘要 |
+| 教练上下文 | 本机生成的最小摘要 | 连接 Qwen 后会发送体重、目标、饮食以及用户授权的运动与睡眠文字摘要 |
 | Apple 健康体重 | Apple HealthKit | 仅在用户授权后写入 Apple 健康 |
 
 项目没有自建服务器、用户账号、广告 SDK 或分析 SDK。Qwen 不可用时，饮食分析自动回退 Apple Vision，教练自动回退 Apple Foundation Models 或本地规则。
@@ -137,10 +139,12 @@ xcodebuild test \
 - Explicit scale binding plus personal-baseline checks to reject another person's readings
 - A date-based photo food diary with portion selection and manual corrections
 - Qwen3.7 Flash food recognition, plate composition, calorie ranges, and uncertainty notes
+- Qwen calorie re-estimation after manual food and portion corrections, without overriding confirmed facts
 - On-device Apple Vision meal analysis as the offline fallback
-- A daily AI coach and seven-day review focused on one actionable next step
+- A previous-day AI coach and seven-day review focused on one actionable next step
+- Optional Apple Health steps, active energy, exercise time, and sleep summaries for the next morning's review
 - Apple Foundation Models copy generation when available, with deterministic local rules as fallback
-- Optional daily coaching and weekly review notifications
+- Optional next-morning coaching notifications, refreshed with the latest health summary when iOS background delivery runs
 - 7 / 30 / 90-day weight trends
 - Apple Health weight export, historical backfill, and sync identifier deduplication
 
@@ -215,7 +219,7 @@ Never place an API key in source code, documentation, `.env` files, shell comman
 | Bluetooth scale advertisements | Processed locally | No |
 | Qwen API key | iOS Keychain, `WhenUnlockedThisDeviceOnly` | Used only to authenticate Qwen requests |
 | Meal photos | Local; uploaded on demand when Qwen is connected | Only during an explicit analysis |
-| Coaching context | Minimal summary created on device | Weight, target, and seven-day meal summary are sent when Qwen is connected |
+| Coaching context | Minimal summary created on device | Weight, target, meal, and user-authorized activity/sleep text summaries are sent when Qwen is connected |
 | Apple Health weight samples | Apple HealthKit | Written only after user authorization |
 
 The project has no custom backend, user accounts, advertising SDKs, or analytics SDKs. When Qwen is unavailable, meal analysis falls back to Apple Vision and coaching falls back to Apple Foundation Models or deterministic local rules.

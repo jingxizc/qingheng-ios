@@ -302,6 +302,54 @@ struct QwenMealPayload: Decodable, Equatable {
     }
 }
 
+struct QwenMealRefinementPayload: Decodable, Equatable {
+    let totalCaloriesLow: Int
+    let totalCaloriesHigh: Int
+    let nutritionScore: Int?
+    let summary: String
+    let confidence: Double
+    let uncertainties: [String]
+
+    enum CodingKeys: String, CodingKey {
+        case totalCaloriesLow = "total_calories_low"
+        case totalCaloriesHigh = "total_calories_high"
+        case nutritionScore = "nutrition_score"
+        case summary
+        case confidence
+        case uncertainties
+    }
+
+    func makeResult(fallbackScore: Int) throws -> MealRefinementResult {
+        let low = min(max(totalCaloriesLow, 30), 4_000)
+        let high = min(max(totalCaloriesHigh, low), 4_000)
+        guard high >= low else {
+            throw QwenMealPayload.PayloadError.invalidAnalysis
+        }
+
+        let normalizedConfidence = confidence > 1 ? confidence / 100 : confidence
+        let cleanSummary = summary.trimmingCharacters(in: .whitespacesAndNewlines)
+        let uncertaintyText = uncertainties
+            .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
+            .filter { !$0.isEmpty }
+            .prefix(2)
+            .joined(separator: "、")
+        let combinedSummary: String
+        if uncertaintyText.isEmpty {
+            combinedSummary = cleanSummary
+        } else {
+            combinedSummary = "\(cleanSummary) 主要不确定项：\(uncertaintyText)。"
+        }
+
+        return MealRefinementResult(
+            caloriesLow: low,
+            caloriesHigh: high,
+            nutritionScore: min(max(nutritionScore ?? fallbackScore, 0), 100),
+            summary: String(combinedSummary.prefix(180)),
+            confidence: min(max(normalizedConfidence, 0), 1)
+        )
+    }
+}
+
 @MainActor
 final class QwenAIService: ObservableObject {
     static let modelID = "qwen3.7-flash-2026-07-15"
@@ -469,23 +517,80 @@ final class QwenAIService: ObservableObject {
         }
     }
 
+    func refineMeal(
+        imageData: Data,
+        confirmedTags: [String],
+        confirmedGroups: [FoodGroup],
+        portion: MealPortion
+    ) async throws -> MealRefinementResult {
+        guard let configuration else {
+            throw ServiceError.notConfigured
+        }
+        let cleanTags = confirmedTags
+            .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
+            .filter { !$0.isEmpty }
+        guard !cleanTags.isEmpty, !confirmedGroups.isEmpty else {
+            throw ServiceError.invalidRequest
+        }
+        guard let preparedImage = preparedJPEG(from: imageData) else {
+            throw ServiceError.invalidImage
+        }
+
+        let imageURL = "data:image/jpeg;base64,\(preparedImage.base64EncodedString())"
+        let groupText = confirmedGroups.map { "\($0.title)(\($0.rawValue))" }.joined(separator: "、")
+        let system = """
+        你是轻衡 App 的饮食热量复核器。用户已经人工确认食物名称、餐盘结构和总体份量，
+        这些信息是不可推翻的事实；不得删除、替换或新增食物。照片只用于判断可见份量、烹调方式、油和酱料等热量因素。
+        不能确定时扩大区间并降低 confidence，不得伪造精确克数。
+        只输出严格 JSON：total_calories_low、total_calories_high、nutrition_score、summary、confidence、uncertainties。
+        confidence 使用 0 到 1，nutrition_score 使用 0 到 100，uncertainties 最多 3 项。
+        """
+        let prompt = """
+        用户确认的食物：\(cleanTags.joined(separator: "、"))
+        用户确认的餐盘结构：\(groupText)
+        用户确认的总体份量：\(portion.title)
+
+        请只重估这一次实际食用量的总热量区间，并更新营养评分和一句不超过 70 个汉字的中文摘要。
+        不要质疑或改写用户确认的食物。按照 JSON 输出。
+        """
+        let output = try await requestText(
+            configuration: configuration,
+            system: system,
+            userContent: [
+                ["type": "image_url", "image_url": ["url": imageURL]],
+                ["type": "text", "text": prompt]
+            ],
+            jsonMode: true,
+            enableThinking: false
+        )
+        let payload = try decodeJSON(QwenMealRefinementPayload.self, from: output)
+        let fallbackScore = FoodKnowledgeBase.nutritionScore(
+            for: confirmedGroups,
+            tags: cleanTags
+        )
+        return try payload.makeResult(fallbackScore: fallbackScore)
+    }
+
     func coachBrief(
         for context: CoachContext,
         fallback: CoachBrief
     ) async -> CoachBrief? {
         guard let configuration else { return nil }
         let system = """
-        你是轻衡 App 的减重陪伴教练。只使用简体中文，只根据用户提供的数据判断。
-        不诊断疾病，不鼓励极端节食，不羞辱用户。每次只给一个可执行的小行动。
+        你是轻衡 App 的个性化减重陪伴教练。只使用简体中文，只根据用户提供的数据判断。
+        优先把昨日饮食、步数、活动能量、锻炼、昨夜睡眠与七日体重趋势放在一起分析。
+        数据可用时，message 至少引用两个具体数据，并解释今天为什么只建议这一件事；不要输出固定口号或照抄模板。
+        不能从一天的体重变化推断脂肪增减，不诊断疾病，不鼓励极端节食、补偿性运动或羞辱用户。
+        每次只给一个温和、能在今天完成的行动。
         以严格 JSON 输出 headline、message、action。action 只能是 weigh、logMeal、reviewMeals、viewProgress、none。
-        headline 不超过 18 个汉字，message 不超过 80 个汉字。
+        headline 不超过 18 个汉字，message 不超过 110 个汉字。
         """
         let user = """
         用户数据：
         \(context.promptDescription)
 
-        本地安全规则建议：\(fallback.headline)；\(fallback.message)
-        请综合数据生成今天最值得做的一步，并按照 JSON 输出。
+        本地规则仅提供安全兜底和按钮方向：action=\(fallback.action.rawValue)。不要复述它的标题或文案。
+        请独立综合数据生成今天最值得做的一步，并按照 JSON 输出。
         """
 
         do {
@@ -497,9 +602,11 @@ final class QwenAIService: ObservableObject {
                 enableThinking: false
             )
             let payload = try decodeJSON(QwenCoachPayload.self, from: output)
-            return payload.makeBrief(fallback: fallback)
+            let brief = payload.makeBrief(fallback: fallback)
+            lastFallbackReason = nil
+            return brief
         } catch {
-            lastFallbackReason = "Qwen 教练暂时不可用，本次已使用本机建议。"
+            lastFallbackReason = "Qwen 教练请求失败：\(safeMessage(for: error)) 本次已使用本机建议。"
             return nil
         }
     }

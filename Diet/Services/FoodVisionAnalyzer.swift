@@ -84,6 +84,14 @@ struct FoodVisionAnalysis: Equatable, Sendable {
     }
 }
 
+struct MealRefinementResult: Equatable, Sendable {
+    let caloriesLow: Int
+    let caloriesHigh: Int
+    let nutritionScore: Int
+    let summary: String
+    let confidence: Double
+}
+
 enum FoodVisionAnalyzer {
     enum AnalysisError: LocalizedError {
         case unreadableImage

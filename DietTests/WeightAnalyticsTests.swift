@@ -148,7 +148,14 @@ final class WeightAnalyticsTests: XCTestCase {
             todayGroups: [],
             mealRecordingStreak: 0,
             weightDaysInLastSevenDays: 1,
-            hour: 9
+            hour: 9,
+            previousDay: nil,
+            previousDayMealCount: 0,
+            previousDayAnalyzedMealCount: 0,
+            previousDayCaloriesLow: nil,
+            previousDayCaloriesHigh: nil,
+            previousDayGroups: [],
+            previousDayHealth: nil
         )
 
         let brief = LocalCoachEngine.brief(for: context)
@@ -278,5 +285,148 @@ final class WeightAnalyticsTests: XCTestCase {
         XCTAssertEqual(estimatedRange.upperBound, 630)
         XCTAssertEqual(analysis.confidence, 0.82, accuracy: 0.001)
         XCTAssertTrue(analysis.summary.contains("烹调油用量不可见"))
+    }
+
+    func testQwenRefinementBuildsBoundedResultWithoutChangingConfirmedFoods() throws {
+        let payload = QwenMealRefinementPayload(
+            totalCaloriesLow: 460,
+            totalCaloriesHigh: 650,
+            nutritionScore: 86,
+            summary: "按确认后的食物重新估算，餐盘结构较完整。",
+            confidence: 78,
+            uncertainties: ["烹调油用量不可见"]
+        )
+
+        let result = try payload.makeResult(fallbackScore: 72)
+
+        XCTAssertEqual(result.caloriesLow, 460)
+        XCTAssertEqual(result.caloriesHigh, 650)
+        XCTAssertEqual(result.nutritionScore, 86)
+        XCTAssertEqual(result.confidence, 0.78, accuracy: 0.001)
+        XCTAssertTrue(result.summary.contains("烹调油用量不可见"))
+    }
+
+    func testMealCorrectionKeepsUserFactsAndUsesQwenRefinementNarrative() {
+        let initial = FoodVisionAnalysis(
+            tags: ["披萨"],
+            groups: [.fastFood],
+            mediumCaloriesLow: 700,
+            mediumCaloriesHigh: 1_000,
+            nutritionScore: 35,
+            summary: "初次识别结果",
+            confidence: 0.4,
+            rawLabels: ["pizza"]
+        )
+        let meal = MealRecord(mealType: .lunch, analysis: initial)
+        let refinement = MealRefinementResult(
+            caloriesLow: 430,
+            caloriesHigh: 610,
+            nutritionScore: 88,
+            summary: "用户确认后，主食、蛋白质和蔬菜搭配较完整。",
+            confidence: 0.83
+        )
+
+        meal.applyCorrection(
+            tags: ["米饭", "鸡蛋", "青菜"],
+            groups: [.carbohydrate, .protein, .vegetable],
+            portion: .regular,
+            caloriesLow: refinement.caloriesLow,
+            caloriesHigh: refinement.caloriesHigh,
+            refinement: refinement
+        )
+
+        XCTAssertEqual(meal.analysisTags, ["米饭", "鸡蛋", "青菜"])
+        XCTAssertEqual(meal.analysisGroups, [.carbohydrate, .protein, .vegetable])
+        XCTAssertEqual(meal.calorieRangeText, "430–610 千卡")
+        XCTAssertEqual(meal.nutritionScore, 88)
+        XCTAssertEqual(meal.analysisSummary, refinement.summary)
+        XCTAssertEqual(meal.analysisConfidence, 0.83)
+        XCTAssertTrue(meal.isUserCorrected)
+    }
+
+    func testSleepIntervalsAreMergedWithoutDoubleCountingOverlaps() {
+        let start = Date(timeIntervalSince1970: 10_000)
+        let minutes = HealthKitManager.mergedMinutes([
+            DateInterval(start: start, duration: 120 * 60),
+            DateInterval(start: start.addingTimeInterval(60 * 60), duration: 120 * 60),
+            DateInterval(start: start.addingTimeInterval(240 * 60), duration: 60 * 60)
+        ])
+
+        XCTAssertEqual(minutes, 240)
+    }
+
+    func testMorningCoachCombinesPreviousActivitySleepAndMeals() throws {
+        var calendar = Calendar(identifier: .gregorian)
+        calendar.timeZone = try XCTUnwrap(TimeZone(secondsFromGMT: 0))
+        let now = Date(timeIntervalSince1970: 1_700_035_200)
+        let yesterday = try XCTUnwrap(calendar.date(byAdding: .day, value: -1, to: now))
+        let meal = MealRecord(eatenAt: yesterday, mealType: .dinner)
+        meal.applyCorrection(
+            tags: ["米饭", "青菜"],
+            groups: [.carbohydrate, .vegetable],
+            portion: .regular,
+            caloriesLow: 420,
+            caloriesHigh: 560
+        )
+        let health = DailyHealthSummary(
+            day: calendar.startOfDay(for: yesterday),
+            steps: 3_200,
+            activeEnergyKcal: 180,
+            exerciseMinutes: 8,
+            sleepMinutes: 420
+        )
+        let context = CoachContext.make(
+            weights: [WeightRecord(weightKg: 72, measuredAt: yesterday)],
+            meals: [meal],
+            targetWeight: 65,
+            previousDayHealth: health,
+            now: now,
+            calendar: calendar
+        )
+
+        let brief = LocalCoachEngine.brief(for: context)
+
+        XCTAssertEqual(context.previousDayMealCount, 1)
+        XCTAssertEqual(context.previousDayCaloriesLow, 420)
+        XCTAssertTrue(context.promptDescription.contains("3,200 步"))
+        XCTAssertTrue(context.promptDescription.contains("睡眠 7 小时"))
+        XCTAssertTrue(brief.message.contains("3,200"))
+        XCTAssertTrue(brief.message.contains("8 分钟"))
+    }
+
+    func testNextMorningReminderNeverSchedulesInThePast() throws {
+        var calendar = Calendar(identifier: .gregorian)
+        calendar.timeZone = try XCTUnwrap(TimeZone(secondsFromGMT: 0))
+        let morning = try XCTUnwrap(calendar.date(from: DateComponents(
+            year: 2026,
+            month: 8,
+            day: 12,
+            hour: 7,
+            minute: 30
+        )))
+        let evening = try XCTUnwrap(calendar.date(from: DateComponents(
+            year: 2026,
+            month: 8,
+            day: 12,
+            hour: 21
+        )))
+
+        let todayReminder = CoachNotificationManager.nextReminderDate(
+            hour: 8,
+            minute: 0,
+            now: morning,
+            calendar: calendar
+        )
+        let tomorrowReminder = CoachNotificationManager.nextReminderDate(
+            hour: 8,
+            minute: 0,
+            now: evening,
+            calendar: calendar
+        )
+
+        XCTAssertTrue(calendar.isDate(todayReminder, inSameDayAs: morning))
+        XCTAssertFalse(calendar.isDate(tomorrowReminder, inSameDayAs: evening))
+        XCTAssertGreaterThan(todayReminder, morning)
+        XCTAssertGreaterThan(tomorrowReminder, evening)
     }
 }
