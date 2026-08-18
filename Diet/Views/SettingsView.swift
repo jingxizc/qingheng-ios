@@ -400,7 +400,7 @@ struct SettingsView: View {
                 VStack(alignment: .leading, spacing: 3) {
                     Text("用于昨日复盘与晨报")
                         .font(.subheadline.weight(.semibold))
-                    Text("只读取步数、活动能量、锻炼时长和睡眠时段")
+                    Text("读取运动与睡眠并在本机汇总；连接 Qwen 时会发送汇总数字")
                         .font(.caption)
                         .foregroundStyle(AppTheme.secondaryInk)
                 }
@@ -544,6 +544,17 @@ struct SettingsView: View {
                     .foregroundStyle(AppTheme.secondaryInk)
                     .fixedSize(horizontal: false, vertical: true)
             }
+
+            Spacer(minLength: 4)
+
+            Link(
+                destination: URL(string: "https://jingxizc.github.io/qingheng-ios/privacy.html")!
+            ) {
+                Image(systemName: "arrow.up.right.square")
+                    .font(.subheadline.weight(.semibold))
+                    .foregroundStyle(AppTheme.ink)
+            }
+            .accessibilityLabel("查看隐私政策")
         }
         .foregroundStyle(AppTheme.ink)
         .appCard()

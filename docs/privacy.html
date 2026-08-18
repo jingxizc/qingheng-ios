@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  <title>轻衡隐私政策 · QingHeng Privacy Policy</title>
+  <style>
+    :root { color-scheme: light dark; --bg:#f4f5ef; --card:#fff; --ink:#17201d; --muted:#66706c; --line:#dde1d8; --accent:#b9f24a; }
+    @media (prefers-color-scheme: dark) { :root { --bg:#101512; --card:#18201c; --ink:#f1f5ef; --muted:#aab4ae; --line:#303b35; --accent:#a8df45; } }
+    * { box-sizing:border-box; }
+    body { margin:0; background:var(--bg); color:var(--ink); font:16px/1.72 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; }
+    main { width:min(880px,calc(100% - 32px)); margin:48px auto; }
+    header,section { background:var(--card); border:1px solid var(--line); border-radius:24px; padding:clamp(22px,5vw,42px); margin:18px 0; }
+    .badge { display:inline-block; padding:5px 12px; border-radius:999px; background:var(--accent); color:#17201d; font-size:13px; font-weight:700; }
+    h1 { margin:16px 0 6px; font-size:clamp(32px,6vw,52px); line-height:1.08; letter-spacing:-.035em; }
+    h2 { margin:0 0 12px; font-size:23px; }
+    h3 { margin:28px 0 8px; font-size:18px; }
+    p,li { color:var(--muted); }
+    strong { color:var(--ink); }
+    a { color:inherit; text-decoration-thickness:1px; text-underline-offset:3px; }
+    nav { display:flex; gap:10px; flex-wrap:wrap; margin-top:22px; }
+    nav a { text-decoration:none; border:1px solid var(--line); border-radius:999px; padding:7px 13px; }
+    table { width:100%; border-collapse:collapse; margin-top:14px; }
+    th,td { text-align:left; vertical-align:top; border-bottom:1px solid var(--line); padding:12px 8px; }
+    th { font-size:13px; color:var(--ink); }
+    td { color:var(--muted); }
+    footer { text-align:center; color:var(--muted); font-size:13px; padding:24px; }
+  </style>
+</head>
+<body>
+<main>
+  <header>
+    <span class="badge">Local-first · 本地优先</span>
+    <h1>轻衡隐私政策</h1>
+    <p>QingHeng Privacy Policy</p>
+    <p><strong>生效日期 / Effective date:</strong> 2026-08-17</p>
+    <nav><a href="#zh">中文</a><a href="#en">English</a><a href="https://github.com/jingxizc/qingheng-ios/issues">联系与反馈 / Contact</a></nav>
+  </header>
+
+  <section id="zh">
+    <h2>中文</h2>
+    <p>轻衡是一款本地优先的体重与饮食记录应用。开发者不运营用户账户、广告系统、分析平台或存储个人记录的自建服务器。</p>
+
+    <h3>1. 本机保存的数据</h3>
+    <ul>
+      <li>体重、目标体重、身高、称呼、饮食记录、饮食照片和应用设置；</li>
+      <li>已绑定体重秤的本机标识，以及用于过滤异常读数的个人体重基线；</li>
+      <li>Qwen API Key，保存在仅限本设备且仅解锁时可访问的 iOS 钥匙串中。</li>
+    </ul>
+    <p>这些数据默认留在设备上，不会发送给开发者。</p>
+
+    <h3>2. Apple 健康</h3>
+    <p>经你单独授权后，轻衡可以向 HealthKit 写入体重，并读取步数、活动能量、锻炼时长和睡眠时段。轻衡不会读取病历、心率或其他未在授权界面列出的健康类型。健康数据只用于体重趋势、昨日复盘和晨间建议，不用于广告、营销、数据经纪或信用判断。</p>
+
+    <h3>3. 可选的 Qwen 云端 AI</h3>
+    <p>云端 AI 默认未连接。只有当你自行提供 Qwen API Key 并主动使用相关功能时，轻衡才会从设备直接向你选择的 Qwen/DashScope 接口发送：</p>
+    <ul>
+      <li>你主动提交分析的饮食照片，以及份量和餐食说明；</li>
+      <li>生成教练建议所需的体重、目标、饮食、运动和睡眠文字摘要；</li>
+      <li>用于请求鉴权的 Qwen API Key。</li>
+    </ul>
+    <p>轻衡不会向 Qwen 上传 HealthKit 原始样本。Qwen 对请求内容和账户标识的处理受其自身条款与隐私政策约束；开发者无法控制其保留周期。你可以不连接 Qwen，或随时在应用中移除连接，继续使用本机分析和本地规则。</p>
+
+    <h3>4. 蓝牙、相机、照片和通知</h3>
+    <p>蓝牙用于发现并读取兼容体重秤的广播；相机和照片权限用于创建饮食记录；通知用于你选择开启的晨间提醒。这些权限可在 iOS 设置中随时关闭。</p>
+
+    <h3>5. 数据删除与保留</h3>
+    <p>删除应用会删除其本地数据库、照片副本、设置和钥匙串配置。已经写入 Apple 健康的数据由 HealthKit 管理，可在“健康”App 中查看或删除。发送给 Qwen 的内容应依照 Qwen 的账户工具和政策处理。</p>
+
+    <h3>6. 儿童、变更与联系</h3>
+    <p>轻衡不是面向儿童设计的服务，也不提供医疗诊断。政策发生实质变化时，本页面会更新生效日期。隐私问题可通过 <a href="https://github.com/jingxizc/qingheng-ios/issues">GitHub Issues</a> 联系开发者。</p>
+  </section>
+
+  <section id="en" lang="en">
+    <h2>English</h2>
+    <p>QingHeng is a local-first weight and meal journal. The developer does not operate user accounts, advertising, analytics, or a custom server that stores personal records.</p>
+
+    <h3>1. Data stored on your device</h3>
+    <ul>
+      <li>Weight, goals, height, display name, meal records, meal photos, and app settings;</li>
+      <li>The locally stored identifier of a paired scale and a personal baseline used to reject anomalous readings;</li>
+      <li>Your Qwen API key in the iOS Keychain, restricted to the unlocked device.</li>
+    </ul>
+    <p>This data remains on your device by default and is not sent to the developer.</p>
+
+    <h3>2. Apple Health</h3>
+    <p>With separate permission, QingHeng can write weight to HealthKit and read steps, active energy, exercise time, and sleep intervals. It does not read clinical records, heart rate, or health types not shown in the permission flow. Health data is used only for weight trends and coaching, never for advertising, marketing, data brokerage, or credit decisions.</p>
+
+    <h3>3. Optional Qwen cloud AI</h3>
+    <p>Cloud AI is disconnected by default. If you provide your own Qwen API key and actively use an AI feature, QingHeng sends requests directly from your device to the selected Qwen/DashScope endpoint. A request may include a meal photo and portion details, text summaries of weight, goals, meals, activity, and sleep, and the API key required for authentication.</p>
+    <p>Raw HealthKit samples are never uploaded to Qwen. Qwen processes request content and account identifiers under its own terms and privacy policy, including any applicable retention. You can avoid cloud processing or remove the connection at any time and continue using on-device analysis and local rules.</p>
+
+    <h3>4. Bluetooth, camera, photos, and notifications</h3>
+    <p>Bluetooth discovers compatible scales; camera and photo access create meal records; notifications provide optional morning reminders. You can revoke these permissions in iOS Settings.</p>
+
+    <h3>5. Retention and deletion</h3>
+    <p>Deleting QingHeng removes its local database, copied photos, settings, and Keychain configuration. Weight samples already written to Apple Health are controlled from the Health app. Content sent to Qwen is handled through Qwen account tools and policies.</p>
+
+    <h3>6. Children, changes, and contact</h3>
+    <p>QingHeng is not designed for children and does not provide medical diagnosis. Material changes will update the effective date above. Contact the developer through <a href="https://github.com/jingxizc/qingheng-ios/issues">GitHub Issues</a>.</p>
+  </section>
+  <footer>QingHeng · 轻衡</footer>
+</main>
+</body>
+</html>

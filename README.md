@@ -6,7 +6,7 @@ A modern, local-first iOS weight and meal tracker. It syncs compatible Bluetooth
 
 [中文](#中文) · [English](#english)
 
-许可证 / License：[MIT](LICENSE)
+许可证 / License：[MIT](LICENSE) · [隐私政策 / Privacy Policy](docs/privacy.html)
 
 ---
 
@@ -93,6 +93,8 @@ A modern, local-first iOS weight and meal tracker. It syncs compatible Bluetooth
 6. 扫描完成后关闭二维码窗口。二维码本身等同于密钥，请勿截图或分享。
 
 ### 数据与隐私
+
+面向 TestFlight 和 App Store 用户的完整中英文政策见 [隐私政策](docs/privacy.html)。
 
 | 数据 | 默认位置 | 是否离开设备 |
 | --- | --- | --- |
@@ -212,6 +214,8 @@ Never place an API key in source code, documentation, `.env` files, shell comman
 6. Close the QR window after scanning. Treat the QR code as a credential: do not screenshot or share it.
 
 ### Data and privacy
+
+See the complete bilingual [Privacy Policy](docs/privacy.html) for TestFlight and App Store distribution.
 
 | Data | Default storage | Leaves the device? |
 | --- | --- | --- |
